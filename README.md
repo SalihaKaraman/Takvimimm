@@ -7,8 +7,8 @@
 ### 📅 Aylık Takvim Görünümü
 - Günü güne takvim ızgarası
 - Türkçe gün ve ay isimleri
-- Seçilen günün açılı detay paneli
-- Responsive tasarım (dar ve geniş ekranlar için optimize edilmiş)
+- **Modern Modal Detay Penceresi:** Seçilen günün detayları ekranın tam ortasında süzülen şık bir pencerede açılır
+- **Buzlu Cam (Backdrop Blur) & Karartma:** Detay modalı açıldığında arka plan yumuşak bir şekilde bulanıklaşır ve karartılır
 
 ### ✅ Görev Yönetimi
 - **Günlük görevler**: Her gün için yapılacak görevler listesi oluşturun
@@ -33,10 +33,10 @@
 
 ### 🎨 Modern Tasarım
 - Türkçe tam dil desteği
-- Koyu/açık tema
-- Responsive yerleşim:
-  - **Dar ekranlar (< 950px)**: Detay paneli üst üste binen aşan panel olarak açılır
-  - **Geniş ekranlar (≥ 950px)**: Takvim ve detay paneli yan yana görünür
+- Derin gece mavisi tabanlı koyu tema ve neon lavanta aksan renkleri
+- **Buzlu Cam Arayüzü:** Modal açıldığında arka plana `BackdropFilter` ile uygulanan ultra pürüzsüz estetik blur
+- **Premium Animasyonlu Geçiş:** `AnimatedSwitcher` entegrasyonu ile yumuşak büyüyen (Scale) ve beliren (Fade) modal animasyonları (`Curves.easeOutBack`)
+- **Masaüstü Odaklı Pratik UX:** Klavyeden `ESC` tuşuyla veya modal dışındaki herhangi bir boşluğa tıklayarak pencereyi anında kapatabilme desteği
 
 ## 🚀 Başlangıç
 
