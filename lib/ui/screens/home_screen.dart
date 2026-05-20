@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/calendar_provider.dart';
 import '../../ui/theme/app_theme.dart';
@@ -24,55 +26,88 @@ class HomeScreen extends StatelessWidget {
     final provider = context.watch<CalendarProvider>();
 
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // Genişliğe göre responsive mod seçimi (950px eşik değeri)
-          final bool isNarrow = constraints.maxWidth < 950;
+      body: Stack(
+        children: [
+          // ── 1. Merkez Panel: Takvim Grid Görünümü ─────────────────────
+          Positioned.fill(
+            child: Container(
+              color: AppTheme.bgPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: const MonthGridWidget(),
+            ),
+          ),
 
-          return Stack(
-            children: [
-              // ── 1. Merkez Panel: Takvim Grid Görünümü ─────────────────────
-              Positioned.fill(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    // Geniş ekranlarda takvimi sağa kaydırıp yer açıyoruz, dar ekranlarda yer açmıyoruz (overlay)
-                    right: (provider.isDayPanelOpen && !isNarrow)
-                        ? AppTheme.dayPanelWidth
-                        : 0,
+          // ── 2. Modal Katmanı: Detay Penceresi (Buzlu Cam & Animasyon) ───
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              reverseDuration: const Duration(milliseconds: 250),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                // Fade ve yumuşak Scale animasyonu ile premium geçiş
+                return FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: Tween<double>(begin: 0.94, end: 1.0).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutBack,
+                      ),
+                    ),
+                    child: child,
                   ),
+                );
+              },
+              child: provider.isDayPanelOpen
+                  ? _buildModalOverlay(context, provider)
+                  : const SizedBox.shrink(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Arka planı bulanıklaştıran ve ESC tuşunu dinleyen modal katmanı widget'ı.
+  Widget _buildModalOverlay(BuildContext context, CalendarProvider provider) {
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          provider.closeDayPanel();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Stack(
+        children: [
+          // ── Tıklanabilir Arka Plan & Bulanıklaştırma (Blur) ───────────
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: provider.closeDayPanel,
+              behavior: HitTestBehavior.opaque,
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                   child: Container(
-                    color: AppTheme.bgPrimary,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                    child: const MonthGridWidget(),
+                    color: Colors.black.withOpacity(0.45),
                   ),
                 ),
               ),
+            ),
+          ),
 
-              // ── 2. Sağ Panel: Detay Paneli (Seçili gün varsa görünür) ──────────
-              if (provider.isDayPanelOpen)
-                Positioned(
-                  top: 0,
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      boxShadow: isNarrow
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.5),
-                                blurRadius: 25,
-                                spreadRadius: 4,
-                                offset: const Offset(-5, 0),
-                              )
-                            ]
-                          : null,
-                    ),
-                    child: const DayDetailPanelWidget(),
-                  ),
-                ),
-            ],
-          );
-        },
+          // ── Merkezî Modal Kartı ─────────────────────────────────────
+          Center(
+            child: GestureDetector(
+              onTap: () {}, // İçeriğe tıklanınca kapanmayı engelle
+              behavior: HitTestBehavior.opaque,
+              child: const DayDetailPanelWidget(),
+            ),
+          ),
+        ],
       ),
     );
   }

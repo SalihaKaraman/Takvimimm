@@ -84,15 +84,27 @@ class _DayDetailPanelWidgetState extends State<DayDetailPanelWidget> {
         DateFormat('d MMMM yyyy, EEEE', 'tr_TR').format(date);
 
     return Container(
-      width: AppTheme.dayPanelWidth,
-      decoration: const BoxDecoration(
-        color: AppTheme.bgSurface,
-        border: Border(
-          left: BorderSide(color: AppTheme.border),
-        ),
+      constraints: BoxConstraints(
+        maxWidth: 550,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
-      child: Column(
-        children: [
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.bgSurface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.border, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 40,
+            offset: const Offset(0, 15),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
+          children: [
           // ── ÜST KISIM: Panel Başlığı & Kapat Butonu ──────────────────────
           Container(
             padding: const EdgeInsets.all(20),
@@ -221,6 +233,7 @@ class _DayDetailPanelWidgetState extends State<DayDetailPanelWidget> {
           ),
         ],
       ),
+    ),
     );
   }
 }
